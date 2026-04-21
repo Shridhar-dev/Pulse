@@ -1,6 +1,7 @@
 "use client";
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { ClerkProvider, Show, SignInButton, SignUpButton, UserButton } from '@clerk/nextjs'
 
 export default function NavBar() {
   const pathname = usePathname();
@@ -19,7 +20,6 @@ export default function NavBar() {
         <span className="text-xl font-bold tracking-tighter text-zinc-900 font-headline">Pulse</span>
         
         <div className="relative hidden lg:block w-64">
-          <span className="material-symbols-outlined absolute left-0 top-1/2 -translate-y-1/2 text-outline-variant text-[18px]">search</span>
           <input 
             className="w-full bg-transparent border-0 border-b border-outline-variant/20 focus:border-primary focus:ring-0 pl-7 py-1 text-sm font-body text-on-surface placeholder:text-outline-variant transition-colors" 
             placeholder="Search infrastructure..." 
@@ -55,12 +55,18 @@ export default function NavBar() {
         <Link href="/settings-config" className="text-on-surface-variant hover:text-primary transition-colors flex items-center justify-center">
           <span className="material-symbols-outlined text-[20px]">settings</span>
         </Link>
-        <div className="w-8 h-8 rounded-full bg-zinc-200 overflow-hidden ml-2 border border-outline-variant/20">
-          <img 
-            alt="User profile" 
-            className="w-full h-full object-cover grayscale opacity-80" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcIMn4bRf7vsVZd6nR-Coz-BYmFA2P9ppWa64B1vd2wcuE_P187FHbq76VRQ87rN4o9qVQ6xatXyTIcjYIuak7HvenASb5KGv3bo-VIBKc5YNplRQhcWDgDeOCLvhM2-aE-xGuI3FnjXQB2RYb49tbq5LWmH4MwCdCHRPxeAYyAKL5LXe_J-aaMoz6le3Kyc9UnNKw_ucFsSxKwQxbxBtIAA_SwdcKxwqiw-pLaS52jg3XQ2VeA5gh69AThFhBnBT1KYuINtj-rA"
-          />
+        <div>
+          <Show when="signed-out">
+              <SignInButton />
+              <SignUpButton>
+                <button className="">
+                  Sign Up
+                </button>
+              </SignUpButton>
+            </Show>
+            <Show when="signed-in">
+              <UserButton />
+            </Show>
         </div>
       </div>
     </nav>

@@ -1,9 +1,9 @@
 'use client'
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
+import Lenis from 'lenis';  
 // Register ScrollTrigger plugin
 if (typeof window !== 'undefined') {
   gsap.registerPlugin(ScrollTrigger);
@@ -13,6 +13,33 @@ export default function NexusLanding() {
   const containerRef = useRef(null);
   const svgPathRef = useRef(null);
 
+
+ useEffect(() => {
+    // 1. Initialize Lenis
+    const lenis = new Lenis({
+      duration: 1.2,
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Optional easing
+    });
+
+    // 2. Sync ScrollTrigger
+    lenis.on('scroll', ScrollTrigger.update);
+
+    // 3. Create a named function for the ticker so we can remove it later
+    const tickerRaf = (time: number) => {
+      lenis.raf(time * 1000);
+    };
+
+    gsap.ticker.add(tickerRaf);
+    gsap.ticker.lagSmoothing(0);
+
+    // 4. CRITICAL: Cleanup function
+    return () => {
+      lenis.destroy();
+      gsap.ticker.remove(tickerRaf);
+      // Optional: Clean up all ScrollTriggers when leaving this page
+      ScrollTrigger.getAll().forEach(t => t.kill());
+    };
+  }, []); // Empty dependency array ensures this only runs once
   useGSAP(() => {
     const tl = gsap.timeline({ defaults: { ease: "power4.out", duration: 1.2 } });
 
@@ -38,8 +65,6 @@ export default function NexusLanding() {
       y: 60,
       opacity: 0,
       stagger: 0.2,
-      duration: 1,
-      ease: "expo.out"
     });
 
     // 4. Gauge Animation (Triggers when scrolled into view)
@@ -54,7 +79,7 @@ export default function NexusLanding() {
       delay: 0.5,
       ease: "power2.out"
     });
-
+    ScrollTrigger.refresh();
   }, { scope: containerRef });
 
   return (

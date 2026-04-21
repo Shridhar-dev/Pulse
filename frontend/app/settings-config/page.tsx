@@ -3,49 +3,34 @@
 import React, { useRef } from 'react';
 import gsap from 'gsap';
 import { useGSAP } from '@gsap/react';
+import { useUser } from '@clerk/nextjs';
 
 export default function SettingsConfig() {
   const container = useRef(null);
+  const { isLoaded, isSignedIn, user } = useUser();
 
   useGSAP(() => {
+    if (!isLoaded) return;
+
     const tl = gsap.timeline({ defaults: { ease: "power4.out", duration: 1 } });
 
-    // 1. Sidebar Entrance (Slide from right)
-    tl.from(".sidebar-right", { 
-      x: 100, 
-      opacity: 0, 
-      duration: 1.2 
-    })
-    .from(".sidebar-item", { 
-      y: 20, 
-      opacity: 0, 
-      stagger: 0.1 
-    }, "-=0.8")
-
-    // 2. Main Content Header
-    .from(".settings-title", { 
+    tl.from(".settings-title", { 
       y: 40, 
       opacity: 0, 
       duration: 1.2 
-    }, "-=1")
-
-    // 3. Section Reveal (Identity, Topography, etc.)
+    })
     .from(".settings-section", {
       y: 30,
       opacity: 0,
       stagger: 0.2,
       clearProps: "all"
     }, "-=0.8")
-
-    // 4. Infrastructure Cards (Mini stagger within the section)
     .from(".infra-card", {
       scale: 0.9,
       opacity: 0,
       stagger: 0.1,
       ease: "back.out(1.7)"
     }, "-=0.5")
-
-    // 5. Input Line Underline Animation
     .from(".input-line", {
       scaleX: 0,
       transformOrigin: "left center",
@@ -53,8 +38,17 @@ export default function SettingsConfig() {
       duration: 1.5
     }, "-=1");
 
-  }, { scope: container });
+  }, { scope: container, dependencies: [isLoaded] });
 
+  // 3. Handle loading state
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-1 items-center justify-center h-screen bg-surface-container-lowest">
+        <div className="w-8 h-8 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+  if (!isSignedIn) return null;
   return (
     <div ref={container} className="flex flex-1 overflow-hidden h-[calc(100vh-65px)] bg-surface-container-lowest">
       
@@ -71,22 +65,21 @@ export default function SettingsConfig() {
             <div className="bg-surface-container-lowest p-8 rounded-lg shadow-sm border border-outline-variant/10 flex gap-10 items-start">
               <div className="flex flex-col items-center gap-4">
                 <div className="w-24 h-24 rounded-full bg-surface-container-low flex items-center justify-center overflow-hidden relative group cursor-pointer border border-outline-variant/10">
-                  <img alt="Profile" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?fit=crop&w=200&h=200" />
+                  <img alt="Profile" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src={user.imageUrl} />
                   <div className="absolute inset-0 bg-primary/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                     <span className="material-symbols-outlined text-white">upload</span>
                   </div>
                 </div>
-                <span className="font-label text-[10px] uppercase tracking-widest text-on-surface-variant">Update</span>
               </div>
               <div className="flex-1 flex flex-col gap-6">
                 <div className="flex flex-col gap-1 relative group">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant group-focus-within:text-primary transition-colors">Full Name</label>
-                  <input className="w-full bg-transparent border-0 border-b border-outline-variant/20 px-0 py-2 text-primary font-body text-sm focus:ring-0 focus:border-primary transition-colors" type="text" defaultValue="Elena Rostova" />
+                  <div>{user.firstName + " " + user.lastName}</div>
                   <div className="input-line absolute bottom-0 left-0 w-full h-1px bg-primary scale-x-0"></div>
                 </div>
                 <div className="flex flex-col gap-1 relative group">
                   <label className="font-label text-xs uppercase tracking-widest text-on-surface-variant group-focus-within:text-primary transition-colors">Work Email</label>
-                  <input className="w-full bg-transparent border-0 border-b border-outline-variant/20 px-0 py-2 text-primary font-body text-sm focus:ring-0 focus:border-primary transition-colors" type="email" defaultValue="elena.rostova@pulse.dev" />
+                  <div>{user.emailAddresses[0].emailAddress}</div>
                   <div className="input-line absolute bottom-0 left-0 w-full h-px bg-primary scale-x-0"></div>
                 </div>
               </div>
@@ -94,7 +87,7 @@ export default function SettingsConfig() {
           </section>
 
           {/* 2. Topography Section */}
-          <section className="settings-section flex flex-col gap-6">
+          {/* <section className="settings-section flex flex-col gap-6">
             <h3 className="font-headline text-2xl font-medium text-primary tracking-tight">Active Topography</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[
@@ -111,7 +104,7 @@ export default function SettingsConfig() {
                 </div>
               ))}
             </div>
-          </section>
+          </section> */}
 
           {/* 3. Security Section */}
           <section className="settings-section flex flex-col gap-6">

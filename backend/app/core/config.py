@@ -19,6 +19,20 @@ class Settings(BaseSettings):
     SCHEDULER_BATCH_SIZE: int = 100
     SCHEDULER_INTERVAL_MS: int = 500
     
+    # Fault Tolerance Settings
+    CIRCUIT_BREAKER_THRESHOLD: int = 5
+    CIRCUIT_BREAKER_TIMEOUT_SECONDS: int = 60
+    DISTRIBUTED_LOCK_TIMEOUT_SECONDS: int = 30
+    DEFAULT_WEBHOOK_URL: str = "http://localhost:8000/api/v1/health"
+    
+    # Load Testing Settings
+    LOAD_TEST_CONCURRENCY: int = 60
+    LOAD_TEST_TOTAL_TASKS: int = 10000
+    
+    # Router Settings
+    ROUTER_TAG_JOBS: str = "Jobs"
+    ROUTER_TAG_METRICS: str = "Metrics"
+    
     class Config:
         env_file = ".env"
 

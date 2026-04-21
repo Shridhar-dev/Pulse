@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  # Redis: The high-speed engine for BullMQ and distributed locking [cite: 155, 160]
+  pulse-redis:
+    image: redis:7.2-alpine
+    container_name: pulse-redis
+    ports:
+      - "6379:6379"
+    restart: always
+    command: ["redis-server", "--appendonly", "yes"] # Ensures data isn't lost on restart
+
+  # PostgreSQL: The persistent audit log for the Exactly-Once guarantee [cite: 165]
+  pulse-db:
+    image: postgres:16-alpine
+    container_name: pulse-db
+    environment:
+      POSTGRES_USER: pulse_admin
+      POSTGRES_PASSWORD: pulse_password # Replace this with a secure value in production
+      POSTGRES_DB: pulse_audit
+    ports:
+      - "5432:5432"
+    volumes:
+      - pulse_db_data:/var/lib/postgresql/data
+    restart: always
+
+volumes:
+  pulse_db_data:

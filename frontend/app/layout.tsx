@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import { ClerkProvider} from '@clerk/nextjs'
 import NavBar from "../components/NavBar";
 import "./globals.css";
 import SmoothScrolling from "@/components/SmoothScrolling";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"], variable: "--font-space-grotesk" });
 const geistMono = Geist_Mono({ subsets: ["latin"], variable: "--font-geist-mono" });
 
 export const metadata: Metadata = {
@@ -21,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${geistMono.variable} font-body antialiased selection:bg-primary selection:text-on-primary bg-surface-container-lowest text-on-surface min-h-screen`}>
+      <body className={`${inter.variable} ${geistMono.variable} font-body antialiased selection:bg-primary selection:text-on-primary bg-surface-container-lowest text-on-surface min-h-screen`}>
         <ClerkProvider>
           <SmoothScrolling/>
           <NavBar />

@@ -25,8 +25,8 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-app.include_router(jobs_router, prefix=f"{settings.API_V1_STR}/jobs", tags=["Jobs"])
-app.include_router(metrics_router, prefix=f"{settings.API_V1_STR}/metrics", tags=["Metrics"])
+app.include_router(jobs_router, prefix=f"{settings.API_V1_STR}/jobs", tags=[settings.ROUTER_TAG_JOBS])
+app.include_router(metrics_router, prefix=f"{settings.API_V1_STR}/metrics", tags=[settings.ROUTER_TAG_METRICS])
 
 @app.get("/")
 def health_check():

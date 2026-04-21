@@ -3,9 +3,17 @@ import httpx
 import uuid
 import time
 import sys
+import os
 
-TOTAL_TASKS = 10000
-CONCURRENCY_LIMIT = 60
+try:
+    from app.core.config import settings
+    TOTAL_TASKS = settings.LOAD_TEST_TOTAL_TASKS
+    CONCURRENCY_LIMIT = settings.LOAD_TEST_CONCURRENCY
+    TARGET_URL = f"http://127.0.0.1:8000{settings.API_V1_STR}/jobs/"
+except ImportError:
+    TOTAL_TASKS = int(os.getenv("LOAD_TEST_TOTAL_TASKS", 10000))
+    CONCURRENCY_LIMIT = int(os.getenv("LOAD_TEST_CONCURRENCY", 60))
+    TARGET_URL = os.getenv("LOAD_TEST_TARGET_URL", "http://127.0.0.1:8000/api/v1/jobs/")
 
 async def send_job(client: httpx.AsyncClient, sem: asyncio.Semaphore, i: int):
     async with sem:
@@ -18,7 +26,7 @@ async def send_job(client: httpx.AsyncClient, sem: asyncio.Semaphore, i: int):
         }
         try:
             # Removed 'Connection: close' to allow Keep-Alive socket reuse. This makes it 100x faster!
-            response = await client.post("http://127.0.0.1:8000/api/v1/jobs/", json=payload, timeout=30.0)
+            response = await client.post(TARGET_URL, json=payload, timeout=30.0)
             if response.status_code == 201:
                 print(f"[✅] Task {i} successfully ingested.")
                 return True

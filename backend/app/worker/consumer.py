@@ -22,11 +22,11 @@ async def process_job(job: BullJob, redis_conn: Redis):
     job_id = job.data.get("job_id")
     logger.info(f"==> Received Job {job_id} from BullMQ")
     payload = job.data.get("payload", {})
-    target_url = payload.get("webhook_url", "http://localhost:8000/api/v1/health") 
+    target_url = payload.get("webhook_url", settings.DEFAULT_WEBHOOK_URL) 
     
     # 1. Distributed Lock via Redis (Lock key: pulse_lock:{job_id})
     lock_key = f"pulse_lock:{job_id}"
-    lock_acquired = await redis_conn.set(lock_key, "locked", nx=True, ex=30)
+    lock_acquired = await redis_conn.set(lock_key, "locked", nx=True, ex=settings.DISTRIBUTED_LOCK_TIMEOUT_SECONDS)
     if not lock_acquired:
          logger.warning(f"Failed to acquire lock for job {job_id}")
          raise Exception("Locked by another worker")
@@ -83,8 +83,8 @@ async def process_job(job: BullJob, redis_conn: Redis):
             else:
                 db_job.status = JobStatus.FAILED
                 circuit_failures += 1
-                if circuit_failures >= 5: # Threshold to open circuit
-                    circuit_open_until = time.time() + 60 # open for 60 seconds
+                if circuit_failures >= settings.CIRCUIT_BREAKER_THRESHOLD: # Threshold to open circuit
+                    circuit_open_until = time.time() + settings.CIRCUIT_BREAKER_TIMEOUT_SECONDS # open for configured seconds
                     logger.critical("Circuit Breaker OPENED")
             
             # Audit Trail

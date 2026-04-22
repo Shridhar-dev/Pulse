@@ -1,0 +1,49 @@
+{
+  "name": "pulse-backend",
+  "version": "1.0.0",
+  "description": "High-throughput distributed task scheduling engine",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "dev": "tsx watch src/index.ts",
+    "dev:scheduler": "tsx watch src/scheduler/index.ts",
+    "dev:consumer": "tsx watch src/consumer/index.ts",
+    "migrate": "tsx src/db/migrate.ts",
+    "seed": "tsx src/db/seed.ts",
+    "test": "vitest",
+    "test:load": "tsx src/tests/load-test.ts",
+    "lint": "eslint src/",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down"
+  },
+  "dependencies": {
+    "@clerk/backend": "^3.2.13",
+    "@hono/node-server": "^2.0.0",
+    "bcryptjs": "^2.4.3",
+    "bullmq": "^5.0.0",
+    "croner": "^9.0.0",
+    "dotenv": "^16.4.0",
+    "drizzle-orm": "^0.38.0",
+    "hono": "^4.6.0",
+    "ioredis": "^5.4.0",
+    "jose": "^5.9.0",
+    "nanoid": "^5.0.7",
+    "pg": "^8.13.0",
+    "pino": "^9.5.0",
+    "pino-pretty": "^11.3.0",
+    "uuid": "^10.0.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/pg": "^8.11.0",
+    "@types/bcryptjs": "^2.4.6",
+    "@types/uuid": "^10.0.0",
+    "typescript": "^5.6.0",
+    "tsx": "^4.19.0",
+    "drizzle-kit": "^0.30.0",
+    "vitest": "^2.0.0",
+    "eslint": "^9.15.0"
+  }
+}
